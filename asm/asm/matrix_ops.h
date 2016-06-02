@@ -21,15 +21,18 @@ void asm_multiply(float *vec_a, float *vec_b, float *res, int size){
 	int i;
 	float f = 0;
 	__asm {
-		mov		cx, size;
+		add		cx, size;
 		mov		eax, 0;		//pointer multiplier for float array
 		mov		ebx, 0;		//temporal result register for movss
 		mov		edx, 0;		//result register
 		mov		edi, res;	//pointer to res
 
-		loop:
-			movaps	xmm1, [vec_a + 128 * eax];
-			movaps	xmm2, [vec_b + 128 * eax];
+		cmp		cx, 0;
+		ja		calc;
+		
+		calc:
+			movaps	xmm1, [vec_a + (16 * 4 * eax)];
+			movaps	xmm2, [vec_b + (16 * 4 * eax)];
 			mulps	xmm1, xmm2;
 			haddps	xmm1, xmm1;
 			haddps	xmm1, xmm1;
@@ -38,7 +41,7 @@ void asm_multiply(float *vec_a, float *vec_b, float *res, int size){
 			add		eax,  1;	
 		sub		cx, 4;		//substract 4 (size of xmm)
 		cmp		cx, 0;		//compare cx-cycle-register with 0
-		ja		cx, loop:;  //jump to the start of cycle if not all done
+		ja		calc;  //jump to the start of cycle if not all done
 			
 		mov [edi], edx;
 	};
