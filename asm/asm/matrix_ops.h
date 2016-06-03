@@ -14,7 +14,7 @@ int new_matrix(matrix *to_create){
 	if (to_create->load == nullptr)
 		return (FAIL);
 	for (i = 0; i < temp; i++){
-		to_create->load[i] = -1;
+		to_create->load[i] = 0;
 	}
 	return (SUCCESS);
 }
@@ -22,7 +22,7 @@ int new_matrix(matrix *to_create){
 float dot_product_asm(float *line_array_a, float *line_array_b, int size){
 	int i;
 	float *a, *b, t_res, res = 0;
-	for (i = 0; i < size / 4; i += 4){
+	for (i = 0; i < size / 4; i++){
 		a = line_array_a + i * 4;
 		b = line_array_b + i * 4;
 		__asm {
@@ -42,18 +42,18 @@ float dot_product_asm(float *line_array_a, float *line_array_b, int size){
 }
 
 void multiply(matrix *A, matrix *B, matrix *out){
-	int i, j, temp = 0, temp2;
+	int i, j, temp = 0, temp2, temp3 = 0;
 	out->size = A->size - A->was_aligned_by;
 	new_matrix(out);
 	for (i = 0; i < out->size; i++){
 		temp2 = 0;
 		for (j = 0; j < out->size; j++){
-			out->load[temp + j] = dot_product_asm(A->load + temp, B->load + temp2, A->size);
+			out->load[temp3 + j] = dot_product_asm(A->load + temp, B->load + temp2, A->size);
 			temp2 += A->size;
 		}
+		temp3 += out->size;
 		temp += A->size;
-	}
-	
+	}	
 	destroy_matrix(A);
 	destroy_matrix(B);
 	return;

@@ -13,6 +13,9 @@ int main(){
 	if (get_matrix("input2.txt", &m_B, 0))
 		return 3;
 
+	timer = clock();
+	cycle_cnt = rdtsc();
+
 	multiply(&m_A, &m_B, &out);
 
 	timer = clock() - timer;
