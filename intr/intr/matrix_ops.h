@@ -20,25 +20,21 @@ int new_matrix(matrix *to_create){
 }
 
 float dot_product_asm(float *line_array_a, float *line_array_b, int size){
-	int i;
-	float *a, *b, t_res, res = 0;
-	for (i = 0; i < size / 4; i++){
-		a = line_array_a + i * 4;
-		b = line_array_b + i * 4;
-		__asm {
-			mov		eax, a;			//set pointer to first line
-			mov		ebx, b;			//set pointer to second line
-			movaps	xmm0, [eax];	//load first vector
-			movaps	xmm1, [ebx];	//load second vector
-
-			mulps	xmm0, xmm1;		//multiply vectors
-			haddps	xmm0, xmm0;		//main value in 0-31 and 32-63
-			haddps	xmm0, xmm0;		//value moved to 0-31
-			movss	[t_res], xmm0;	//unload 0-31 to pointer
-		};
-		res += t_res;
+	int i, t_size = size / 4;
+	float t_res = 0, res = 0;
+	__m128 *x_vector, *y_vector, temp;
+	//x_vector = (__m128 *)line_array_a;
+	//y_vector = (__m128 *)line_array_b;
+	for (i = 0; i < t_size; i++){
+		x_vector = (__m128 *)(line_array_a + 4 * i);
+		y_vector = (__m128 *)(line_array_b + 4 * i);
+		temp = _mm_mul_ps(*x_vector, *y_vector);
+		temp = _mm_hadd_ps(temp, temp);
+		temp = _mm_hadd_ps(temp, temp);
+		_mm_store_ss(&res, temp);
+		t_res += res;
 	}
-	return res;
+	return t_res;
 }
 
 void multiply(matrix *A, matrix *B, matrix *out){
@@ -53,7 +49,7 @@ void multiply(matrix *A, matrix *B, matrix *out){
 		}
 		temp3 += out->size;
 		temp += A->size;
-	}	
+	}
 	destroy_matrix(A);
 	destroy_matrix(B);
 	return;
