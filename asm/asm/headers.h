@@ -1,14 +1,6 @@
 #pragma once
 #pragma warning(disable:4996)
 
-struct matrix{
-	short int size = 0;
-	float *load = nullptr;
-	short was_aligned_by = 0;
-};
-
-#define STDPATH "input.txt"
-
 #ifndef SUCCESS
 #define SUCCESS 0
 #endif
@@ -25,9 +17,20 @@ struct matrix{
 #define MAX_LENGTH 256
 #endif
 
+struct matrix{
+	int size = 0;
+	float *load = nullptr;
+	short was_aligned_by = 0;
+};
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <malloc.h>
 #include "matrix_ops.h"
 #include "matrix_io.h"
+#include <stdint.h>
+#include <intrin.h>
+uint64_t rdtsc(){
+	return __rdtsc();
+}
