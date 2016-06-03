@@ -2,9 +2,9 @@
 #pragma warning(disable:4996)
 
 struct matrix{
-	int size;
-	float *load;
-	short was_aligned_by;
+	short int size = 0;
+	float *load = nullptr;
+	short was_aligned_by = 0;
 };
 
 #define STDPATH "input.txt"
